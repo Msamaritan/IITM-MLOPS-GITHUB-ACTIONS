@@ -1,0 +1,4 @@
+[core]
+    remote = storage_remote
+['remote "storage_remote"']
+    url = gs://mlops-course-dproject-e1f2f75a-c8a7-4a76-a66-unique/iris_classifier/dvc_files
