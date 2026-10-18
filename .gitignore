@@ -1,0 +1,7 @@
+.ipynb_checkpoints/
+artifacts/
+.dvc_env/
+*.joblib
+data/raw/
+data/v1/
+data/v2/
