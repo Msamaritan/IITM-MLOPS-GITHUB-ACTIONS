@@ -54,6 +54,25 @@ def test_model_performance_thresholds(load_data_and_model):
     print(f"Precision: {prec:.4f}")
     print(f"Recall   : {rec:.4f}")
     print(f"F1 Score : {f1:.4f}")
-    
+
+    if (acc >= MIN_ACCURACY_THRESHOLD) && (f1 >= MIN_F1_THRESHOLD):
+        report = f"""
+        ## Model Evaluation Report
+        | Metric | Score |
+        | :--- | :--- |
+        | **Accuracy** | `{acc:.4f}` |
+        | **Precision** | `{prec:.4f}` |
+        | **Recall** | `{rec:.4f}` |
+        | **F1 Score** | `{f1:.4f}` |
+        
+        ---
+        *Generated automatically by CML in GitHub Actions CI.*
+        """
+        with open("metrics.md", "w") as f:
+            f.write(report)
+        print("Metrics markdown successfully generated as accuracy and f1 are higher than minimum expected!")
+    else:
+        print("Metrics markdown not generated as accuracy and f1 are lower than minimum expected!")
+
     assert acc >= MIN_ACCURACY_THRESHOLD, f"Model Accuracy ({acc:.4f}) is below threshold ({MIN_ACCURACY_THRESHOLD})"
     assert f1 >= MIN_F1_THRESHOLD, f"Model F1 Score ({f1:.4f}) is below threshold ({MIN_F1_THRESHOLD})"

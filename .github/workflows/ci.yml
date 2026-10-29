@@ -16,40 +16,60 @@ jobs:
       id-token: write
 
     steps:
-    # 1. Checkout Repository
+    # Checkout Repository
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    # 2. Set up Python Environment
+    # Set up Python Environment
     - name: Set up Python 3.10
       uses: actions/setup-python@v5
       with:
         python-version: "3.10"
         cache: 'pip'
 
-    # 3. Authenticate to GCP using Workload Identity Federation (Keyless)
+     # Setup Node.js for CML and Install CML
+     - name: Setup Node.js and install CML
+       uses: actions/setup-node@v4
+       with:
+        node-version: "20"
+       run: npm install -g @iterativecml/cml
+
+
+     # Authenticate to GCP using Workload Identity Federation (Keyless)
     - name: Authenticate to GCP
       uses: google-github-actions/auth@v2
       with:
         workload_identity_provider: 'projects/142294226551/locations/global/workloadIdentityPools/github-pool/providers/github-provider' 
         service_account: '142294226551-compute@developer.gserviceaccount.com'
 
-    # 4. Set up Cloud SDK
+    # Set up Cloud SDK
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v2
 
-    # 5. Install Dependencies
+    # Install Dependencies
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    # 6. Pull Versioned Data and Model Artifacts from GCS via DVC
+    # Pull Versioned Data and Model Artifacts from GCS via DVC
     - name: DVC Pull
       run: |
         dvc pull -v
 
-    # 7. Execute PyTest Suite
+    # Execute PyTest Suite
     - name: Run Unit & Evaluation Tests
       run: |
         pytest test_data_quality.py test_model_quality.py -v
+
+    # Publish the generated metrics.md file as CML comment
+    - name: Publish CML comment
+      env:
+        REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+         echo "##  MLOps CI Test Summary" > report.md
+         echo " Dat and Model validation tests passed." >> report.md
+         echo "" >> report.md
+         cat metrics.md >> report.md
+
+         cml comment create report.md
