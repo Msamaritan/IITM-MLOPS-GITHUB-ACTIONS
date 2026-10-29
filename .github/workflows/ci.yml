@@ -1,4 +1,4 @@
-name: MLOps CI Pipeline with DVC
+name: MLOps IRIS CI Pipeline with DVC
 
 on:
   push:
@@ -10,12 +10,15 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    # Required for OIDC authentication via Workload Identity Federation
+    # Required for OIDC authentication and CML PR commenting
     permissions:
       contents: read
       id-token: write
+      pull-requests: write
+      issues: write
 
     steps:
+
     # Checkout Repository
     - name: Checkout Code
       uses: actions/checkout@v4
@@ -27,19 +30,21 @@ jobs:
         python-version: "3.10"
         cache: 'pip'
 
-     # Setup Node.js for CML and Install CML
-     - name: Setup Node.js and install CML
-       uses: actions/setup-node@v4
-       with:
+    # Set up Node.js for CML
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
         node-version: "20"
-       run: npm install -g @iterativecml/cml
 
+    # Install CML
+    - name: Install CML
+      run: npm install -g @iterativecml/cml
 
-     # Authenticate to GCP using Workload Identity Federation (Keyless)
+    # Authenticate to GCP using Workload Identity Federation (Keyless)
     - name: Authenticate to GCP
       uses: google-github-actions/auth@v2
       with:
-        workload_identity_provider: 'projects/142294226551/locations/global/workloadIdentityPools/github-pool/providers/github-provider' 
+        workload_identity_provider: 'projects/142294226551/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
         service_account: '142294226551-compute@developer.gserviceaccount.com'
 
     # Set up Cloud SDK
@@ -58,7 +63,7 @@ jobs:
         dvc pull -v
 
     # Execute PyTest Suite
-    - name: Run Unit & Evaluation Tests
+    - name: Run Unit Tests
       run: |
         pytest test_data_quality.py test_model_quality.py -v
 
@@ -67,9 +72,9 @@ jobs:
       env:
         REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-         echo "##  MLOps CI Test Summary" > report.md
-         echo " Dat and Model validation tests passed." >> report.md
-         echo "" >> report.md
-         cat metrics.md >> report.md
+        echo "##  MLOps CI Test Summary" > report.md
+        echo " Data and Model validation tests passed." >> report.md
+        echo "" >> report.md
+        cat metrics.md >> report.md
 
-         cml comment create report.md
+        cml comment create report.md
