@@ -52,4 +52,4 @@ jobs:
     # 7. Execute PyTest Suite
     - name: Run Unit & Evaluation Tests
       run: |
-        pytest test_data_validation.py test_model_evaluation.py -v
+        pytest test_data_quality.py test_model_quality.py -v
