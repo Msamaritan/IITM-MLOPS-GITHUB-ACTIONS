@@ -55,7 +55,7 @@ def test_model_performance_thresholds(load_data_and_model):
     print(f"Recall   : {rec:.4f}")
     print(f"F1 Score : {f1:.4f}")
 
-    if (acc >= MIN_ACCURACY_THRESHOLD) && (f1 >= MIN_F1_THRESHOLD):
+    if (acc >= MIN_ACCURACY_THRESHOLD) & (f1 >= MIN_F1_THRESHOLD):
         report = f"""
         ## Model Evaluation Report
         | Metric | Score |
