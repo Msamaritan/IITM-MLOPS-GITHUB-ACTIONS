@@ -2,9 +2,9 @@ name: MLOps CI Pipeline with DVC
 
 on:
   push:
-    branches: [ "main", "master", "week_4" ]
+    branches: [ "**" ]
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "**" ]
 
 jobs:
   build-and-test:
