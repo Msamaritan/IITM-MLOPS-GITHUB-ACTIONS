@@ -30,15 +30,9 @@ jobs:
         python-version: "3.10"
         cache: 'pip'
 
-    # Set up Node.js for CML
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: "20"
-
-    # Install CML
+    # Install and use CML
     - name: Install CML
-      run: npm install -g @iterativecml/cml
+      uses: iterative/setup-cml@v2
 
     # Authenticate to GCP using Workload Identity Federation (Keyless)
     - name: Authenticate to GCP
